@@ -12,6 +12,20 @@ class SatelliteTracker {
         this.speeds = [1, 10, 50, 100];
         this.speedIndex = 0;
         
+        // Satellite images for each category
+        this.satelliteImages = {
+            'Starlink': 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=400&q=80',
+            'Space Stations': 'https://images.unsplash.com/photo-1581822261290-991b38693d1b?w=400&q=80',
+            'Weather': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&q=80',
+            'GPS Operational': 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&q=80',
+            'GLONASS': 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&q=80',
+            'Galileo': 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&q=80',
+            'Türksat': 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=400&q=80',
+            'Communications': 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=400&q=80',
+            'Earth Observation': 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400&q=80',
+            'Science': 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=400&q=80'
+        };
+        
         this.init();
     }
 
@@ -70,8 +84,22 @@ class SatelliteTracker {
         this.viewer.scene.skyAtmosphere.saturationShift = 0.3;
         this.viewer.scene.skyAtmosphere.brightnessShift = -0.2;
         
+        // Enable mouse wheel zoom and all camera controls
+        const scene = this.viewer.scene;
+        const camera = this.viewer.camera;
+        
+        // Enable zoom controls
+        scene.screenSpaceCameraController.enableZoom = true;
+        scene.screenSpaceCameraController.enableRotate = true;
+        scene.screenSpaceCameraController.enableTilt = true;
+        scene.screenSpaceCameraController.enableLook = true;
+        
+        // Set zoom limits
+        scene.screenSpaceCameraController.minimumZoomDistance = 1000000; // 1000 km minimum
+        scene.screenSpaceCameraController.maximumZoomDistance = 40000000; // 40,000 km maximum
+        
         // Set initial camera position
-        this.viewer.camera.setView({
+        camera.setView({
             destination: Cesium.Cartesian3.fromDegrees(0, 30, 20000000)
         });
         
@@ -87,7 +115,8 @@ class SatelliteTracker {
             { name: 'GPS Operational', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=gps-ops&FORMAT=tle', color: '#ffaa00' },
             { name: 'GLONASS', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=glonass-ops&FORMAT=tle', color: '#ff6600' },
             { name: 'Galileo', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=galileo&FORMAT=tle', color: '#aa00ff' },
-            { name: 'Communications', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=geo&FORMAT=tle', color: '#00aaff', limit: 50 },
+            { name: 'Türksat', url: 'https://celestrak.org/NORAD/elements/gp.php?SPECIAL=turkey&FORMAT=tle', color: '#e30a17' }, // Turkish satellites (Red-White like flag)
+            { name: 'Communications', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=geo&FORMAT=tle', color: '#00aaff', limit: 50 }, // Includes Astra and other GEO sats
             { name: 'Earth Observation', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=resource&FORMAT=tle', color: '#88ff00', limit: 30 },
             { name: 'Science', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=science&FORMAT=tle', color: '#ff00ff', limit: 30 }
         ];
@@ -413,8 +442,14 @@ class SatelliteTracker {
         nameEl.textContent = sat.name;
         
         const details = this.getSatelliteDetails(sat);
+        const imageUrl = this.satelliteImages[sat.category] || this.satelliteImages['Communications'];
+        
         if (details) {
             bodyEl.innerHTML = `
+                <div class="satellite-image-container">
+                    <img src="${imageUrl}" alt="${sat.category}" class="satellite-image" onerror="this.style.display='none'"/>
+                    <div class="satellite-image-overlay">${sat.category}</div>
+                </div>
                 <div class="info-row">
                     <span class="info-label">Category</span>
                     <span class="info-value">${sat.category}</span>

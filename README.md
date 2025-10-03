@@ -28,17 +28,19 @@ Real-time 3D visualization of 2500+ satellites orbiting Earth using CesiumJS and
 - 🟡 **GPS Operational** - All active GPS satellites
 - 🟠 **GLONASS** - Russian navigation system
 - 🟣 **Galileo** - European navigation system
-- 🔷 **Communications** - Geostationary communication satellites
+- 🇹🇷 **Türksat** - Turkish communication and observation satellites
+- 🔷 **Communications** - Geostationary satellites (includes Astra, Eutelsat, etc.)
 - 🟩 **Earth Observation** - Resource monitoring satellites
 - 💜 **Science** - Scientific research satellites
 
 ### Interactive Features
 - **Search** - Find any satellite by name
 - **Category Filtering** - Toggle categories on/off
-- **Click to Select** - View detailed satellite information
+- **Click to Select** - View detailed satellite information with representative images
 - **Playback Speed Control** - 1x, 10x, 50x, 100x speed
-- **Camera Controls** - Zoom, pan, rotate the Earth
+- **Camera Controls** - Zoom (mouse wheel), pan, rotate the Earth
 - **Fly to Satellite** - Automatic camera movement
+- **Satellite Images** - Each satellite shows a representative image based on its category
 
 ## 🚀 Quick Start
 
@@ -113,6 +115,7 @@ The included GitHub Actions workflow will automatically deploy on every push to 
 ### Information Panel
 - Opens when you click a satellite
 - Shows:
+  - Representative satellite image based on category
   - Satellite name and category
   - Current latitude/longitude
   - Altitude (km)
