@@ -81,7 +81,7 @@ class SatelliteTracker {
     async loadSatelliteData() {
         // CelesTrak TLE data groups
         const tleGroups = [
-            { name: 'Starlink', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle', color: '#00d9ff', limit: 200 },
+            { name: 'Starlink', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle', color: '#00d9ff' }, // No limit - load all Starlink satellites (2000+)
             { name: 'Space Stations', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle', color: '#ff0044' },
             { name: 'Weather', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=weather&FORMAT=tle', color: '#00ff88' },
             { name: 'GPS Operational', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=gps-ops&FORMAT=tle', color: '#ffaa00' },

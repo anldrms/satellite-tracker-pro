@@ -1,15 +1,15 @@
 # 🛰️ Professional Satellite Tracker
 
-Real-time 3D visualization of 500+ satellites orbiting Earth using CesiumJS and live TLE data from CelesTrak.
+Real-time 3D visualization of 2500+ satellites orbiting Earth using CesiumJS and live TLE data from CelesTrak.
 
-![Satellites](https://img.shields.io/badge/Satellites-500+-blue)
+![Satellites](https://img.shields.io/badge/Satellites-2500+-blue)
 ![3D](https://img.shields.io/badge/3D-Cesium-green)
 ![API](https://img.shields.io/badge/API-CelesTrak-orange)
 
 ## 🌟 Features
 
 ### Real-Time Tracking
-- **500-1000+ Active Satellites** from CelesTrak API
+- **2500+ Active Satellites** from CelesTrak API (including 2000+ Starlink satellites)
 - Live position updates using TLE (Two-Line Element) data
 - Accurate orbital mechanics calculations
 - Real-time velocity and altitude data
@@ -22,7 +22,7 @@ Real-time 3D visualization of 500+ satellites orbiting Earth using CesiumJS and 
 - Smooth camera controls
 
 ### Satellite Categories
-- 🔵 **Starlink** (~200 satellites) - Global internet constellation
+- 🔵 **Starlink** (2000+ satellites) - Global internet constellation
 - 🔴 **Space Stations** - ISS, Tiangong, Hubble
 - 🟢 **Weather** - NOAA, METOP, GOES, FengYun, Aqua, Terra
 - 🟡 **GPS Operational** - All active GPS satellites
@@ -141,7 +141,7 @@ The included GitHub Actions workflow will automatically deploy on every push to 
 
 ## 📊 Performance
 
-- Handles 500-1000+ satellites smoothly
+- Handles 2500+ satellites smoothly (including 2000+ Starlink)
 - Efficient entity management
 - Optimized render loop
 - Lazy loading for satellite list
