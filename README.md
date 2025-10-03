@@ -17,6 +17,7 @@ Real-time 3D visualization of 2500+ satellites orbiting Earth using CesiumJS and
 ### 3D Visualization
 - **CesiumJS 3D Globe** - Professional-grade Earth visualization
 - High-resolution NASA imagery
+- **Country Borders** - Beautiful cyan-colored borders showing all countries
 - Atmospheric lighting effects
 - Day/night cycles
 - Smooth camera controls
@@ -45,7 +46,7 @@ Real-time 3D visualization of 2500+ satellites orbiting Earth using CesiumJS and
 ## 🚀 Quick Start
 
 ### Live Demo
-🌐 **[View Live Demo](https://your-username.github.io/satellite-tracker-pro/)**
+🌐 **[View Live Demo](https://anldrms.github.io/satellite-tracker-pro/)**
 
 ### Prerequisites
 - Modern web browser (Chrome, Firefox, Safari, Edge)

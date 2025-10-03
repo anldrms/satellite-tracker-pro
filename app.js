@@ -84,6 +84,41 @@ class SatelliteTracker {
         this.viewer.scene.skyAtmosphere.saturationShift = 0.3;
         this.viewer.scene.skyAtmosphere.brightnessShift = -0.2;
         
+        // Add country borders (GeoJSON from Natural Earth)
+        try {
+            const countryBorders = await Cesium.GeoJsonDataSource.load(
+                'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson',
+                {
+                    stroke: Cesium.Color.fromCssColorString('#00d9ff').withAlpha(0.5),
+                    strokeWidth: 2,
+                    fill: Cesium.Color.TRANSPARENT,
+                    clampToGround: true
+                }
+            );
+            await this.viewer.dataSources.add(countryBorders);
+            
+            // Style the country borders
+            const entities = countryBorders.entities.values;
+            for (let i = 0; i < entities.length; i++) {
+                const entity = entities[i];
+                if (entity.polygon) {
+                    entity.polygon.material = Cesium.Color.TRANSPARENT;
+                    entity.polygon.outline = true;
+                    entity.polygon.outlineColor = Cesium.Color.fromCssColorString('#00d9ff').withAlpha(0.4);
+                    entity.polygon.outlineWidth = 1.5;
+                }
+                if (entity.polyline) {
+                    entity.polyline.material = Cesium.Color.fromCssColorString('#00d9ff').withAlpha(0.5);
+                    entity.polyline.width = 1.5;
+                }
+            }
+            
+            console.log('Country borders loaded successfully');
+        } catch (error) {
+            console.warn('Could not load country borders:', error);
+            // Continue without country borders if they fail to load
+        }
+        
         // Enable mouse wheel zoom and all camera controls
         const scene = this.viewer.scene;
         const camera = this.viewer.camera;
@@ -115,8 +150,8 @@ class SatelliteTracker {
             { name: 'GPS Operational', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=gps-ops&FORMAT=tle', color: '#ffaa00' },
             { name: 'GLONASS', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=glonass-ops&FORMAT=tle', color: '#ff6600' },
             { name: 'Galileo', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=galileo&FORMAT=tle', color: '#aa00ff' },
-            { name: 'Türksat', url: 'https://celestrak.org/NORAD/elements/gp.php?SPECIAL=turkey&FORMAT=tle', color: '#e30a17' }, // Turkish satellites (Red-White like flag)
-            { name: 'Communications', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=geo&FORMAT=tle', color: '#00aaff', limit: 50 }, // Includes Astra and other GEO sats
+            { name: 'Türksat', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=geo&FORMAT=tle', color: '#e30a17', filter: 'TURKSAT' }, // Turkish satellites from GEO group
+            { name: 'Communications', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=geo&FORMAT=tle', color: '#00aaff', limit: 100 }, // Includes Astra and other GEO sats
             { name: 'Earth Observation', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=resource&FORMAT=tle', color: '#88ff00', limit: 30 },
             { name: 'Science', url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=science&FORMAT=tle', color: '#ff00ff', limit: 30 }
         ];
@@ -155,14 +190,14 @@ class SatelliteTracker {
         try {
             const response = await fetch(group.url);
             const text = await response.text();
-            return this.parseTLE(text, group.name, group.color, group.limit);
+            return this.parseTLE(text, group.name, group.color, group.limit, group.filter);
         } catch (error) {
             console.error(`Error fetching ${group.name}:`, error);
             return [];
         }
     }
 
-    parseTLE(tleData, category, color, limit = null) {
+    parseTLE(tleData, category, color, limit = null, filter = null) {
         const lines = tleData.trim().split('\n');
         const satellites = [];
         
@@ -173,6 +208,11 @@ class SatelliteTracker {
             const name = lines[i].trim();
             const tle1 = lines[i + 1].trim();
             const tle2 = lines[i + 2].trim();
+            
+            // Apply filter if specified (e.g., only TURKSAT satellites)
+            if (filter && !name.toUpperCase().includes(filter.toUpperCase())) {
+                continue;
+            }
             
             if (name && tle1 && tle2) {
                 try {
