@@ -62,8 +62,13 @@ class SatelliteTracker {
     async initCesium() {
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5N2UyMjcwOS00MDY1LTQxYjEtYjZjMy00YTU0ZTg1YmJjMGIiLCJpZCI6ODAzMDYsImlhdCI6MTY0Mjc0ODI2MX0.OiWBnMZxmIRHs_f9uXlPvzpQOw4lWQXKcvCiSF8qBiY';
         
+        // Create a high-quality imagery provider
+        const imageryProvider = new Cesium.TileMapServiceImageryProvider({
+            url: Cesium.buildModuleUrl('Assets/Textures/NaturalEarthII'),
+        });
+        
         this.viewer = new Cesium.Viewer('cesiumContainer', {
-            imageryProvider: new Cesium.IonImageryProvider({ assetId: 3845 }),
+            imageryProvider: imageryProvider,
             baseLayerPicker: false,
             geocoder: false,
             homeButton: false,
@@ -74,53 +79,96 @@ class SatelliteTracker {
             fullscreenButton: false,
             vrButton: false,
             scene3DOnly: true,
-            shouldAnimate: true
+            shouldAnimate: true,
+            contextOptions: {
+                webgl: {
+                    alpha: false,
+                    depth: true,
+                    stencil: false,
+                    antialias: true,
+                    premultipliedAlpha: true,
+                    preserveDrawingBuffer: false,
+                    powerPreference: "high-performance"
+                }
+            }
         });
 
+        // Add multiple base layers for better quality
+        // Layer 1: Natural Earth II (base)
+        this.viewer.imageryLayers.addImageryProvider(
+            new Cesium.TileMapServiceImageryProvider({
+                url: Cesium.buildModuleUrl('Assets/Textures/NaturalEarthII'),
+            })
+        );
+
+        // Layer 2: Stamen Terrain Labels for city/country names
+        try {
+            this.viewer.imageryLayers.addImageryProvider(
+                new Cesium.UrlTemplateImageryProvider({
+                    url: 'https://stamen-tiles.a.ssl.fastly.net/terrain-labels/{z}/{x}/{y}.png',
+                    credit: 'Map tiles by Stamen Design, under CC BY 3.0'
+                })
+            );
+        } catch (e) {
+            console.log('Stamen labels not available');
+        }
+
         // Better visual settings
-        this.viewer.scene.globe.enableLighting = true;
-        this.viewer.scene.globe.atmosphereLightIntensity = 10.0;
-        this.viewer.scene.skyAtmosphere.hueShift = -0.3;
-        this.viewer.scene.skyAtmosphere.saturationShift = 0.3;
-        this.viewer.scene.skyAtmosphere.brightnessShift = -0.2;
+        const scene = this.viewer.scene;
+        const globe = scene.globe;
         
-        // Add country borders (GeoJSON from Natural Earth)
+        globe.enableLighting = true;
+        globe.atmosphereLightIntensity = 20.0;
+        globe.showGroundAtmosphere = true;
+        globe.baseColor = Cesium.Color.fromCssColorString('#0a0e1a');
+        
+        // Enhanced atmosphere
+        scene.skyAtmosphere.hueShift = -0.3;
+        scene.skyAtmosphere.saturationShift = 0.3;
+        scene.skyAtmosphere.brightnessShift = -0.2;
+        
+        // Better rendering quality
+        scene.fog.enabled = true;
+        scene.fog.density = 0.0002;
+        scene.fog.minimumBrightness = 0.03;
+        
+        // Add country borders (GeoJSON from Natural Earth) - BOLD and VISIBLE
         try {
             const countryBorders = await Cesium.GeoJsonDataSource.load(
                 'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson',
                 {
-                    stroke: Cesium.Color.fromCssColorString('#00d9ff').withAlpha(0.5),
-                    strokeWidth: 2,
+                    stroke: Cesium.Color.fromCssColorString('#00ff88').withAlpha(0.8),
+                    strokeWidth: 3,
                     fill: Cesium.Color.TRANSPARENT,
                     clampToGround: true
                 }
             );
             await this.viewer.dataSources.add(countryBorders);
             
-            // Style the country borders
+            // Style the country borders - make them BOLD and VISIBLE
             const entities = countryBorders.entities.values;
             for (let i = 0; i < entities.length; i++) {
                 const entity = entities[i];
                 if (entity.polygon) {
                     entity.polygon.material = Cesium.Color.TRANSPARENT;
                     entity.polygon.outline = true;
-                    entity.polygon.outlineColor = Cesium.Color.fromCssColorString('#00d9ff').withAlpha(0.4);
-                    entity.polygon.outlineWidth = 1.5;
+                    entity.polygon.outlineColor = Cesium.Color.fromCssColorString('#00ff88').withAlpha(0.7);
+                    entity.polygon.outlineWidth = 2.5;
+                    entity.polygon.height = 0;
                 }
                 if (entity.polyline) {
-                    entity.polyline.material = Cesium.Color.fromCssColorString('#00d9ff').withAlpha(0.5);
-                    entity.polyline.width = 1.5;
+                    entity.polyline.material = Cesium.Color.fromCssColorString('#00ff88').withAlpha(0.8);
+                    entity.polyline.width = 2.5;
                 }
             }
             
-            console.log('Country borders loaded successfully');
+            console.log('✅ Country borders loaded successfully');
         } catch (error) {
-            console.warn('Could not load country borders:', error);
+            console.warn('⚠️ Could not load country borders:', error);
             // Continue without country borders if they fail to load
         }
         
         // Enable mouse wheel zoom and all camera controls
-        const scene = this.viewer.scene;
         const camera = this.viewer.camera;
         
         // Enable zoom controls
@@ -133,9 +181,14 @@ class SatelliteTracker {
         scene.screenSpaceCameraController.minimumZoomDistance = 1000000; // 1000 km minimum
         scene.screenSpaceCameraController.maximumZoomDistance = 40000000; // 40,000 km maximum
         
-        // Set initial camera position
+        // Set initial camera position - better view
         camera.setView({
-            destination: Cesium.Cartesian3.fromDegrees(0, 30, 20000000)
+            destination: Cesium.Cartesian3.fromDegrees(35, 40, 15000000), // Center on Turkey/Europe
+            orientation: {
+                heading: 0.0,
+                pitch: -Cesium.Math.PI_OVER_FOUR,
+                roll: 0.0
+            }
         });
         
         this.updateProgress(10);
