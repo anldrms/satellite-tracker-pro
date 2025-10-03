@@ -42,12 +42,29 @@ Real-time 3D visualization of 500+ satellites orbiting Earth using CesiumJS and 
 
 ## 🚀 Quick Start
 
+### Live Demo
+🌐 **[View Live Demo](https://your-username.github.io/satellite-tracker-pro/)**
+
 ### Prerequisites
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- Python 3.x (for local server)
+- Python 3.x (for local development)
 - Internet connection (for CDN resources and API)
 
-### Installation
+### Option 1: Deploy to GitHub Pages (Recommended)
+
+1. **Fork this repository** or create a new repo
+2. **Push the code** to your GitHub repository
+3. **Enable GitHub Pages**:
+   - Go to repository Settings → Pages
+   - Source: Deploy from a branch
+   - Branch: `main` / `(root)`
+   - Click Save
+4. **Wait 1-2 minutes** for deployment
+5. **Visit**: `https://your-username.github.io/repository-name/`
+
+The included GitHub Actions workflow will automatically deploy on every push to `main`.
+
+### Option 2: Local Development
 
 1. Clone or download this repository
 2. Navigate to the directory:
@@ -58,6 +75,8 @@ Real-time 3D visualization of 500+ satellites orbiting Earth using CesiumJS and 
 3. Start local server:
    ```bash
    python3 -m http.server 8000
+   # or
+   npx serve
    ```
 
 4. Open in browser:
